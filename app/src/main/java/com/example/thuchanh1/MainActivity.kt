@@ -4,90 +4,156 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
-                EmailValidationScreen()
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = Color.White
+            ) {
+                Thuchanh1App()
             }
         }
     }
 }
 
 @Composable
-fun EmailValidationScreen() {
-    var email by remember { mutableStateOf("") }
+fun Thuchanh1App() {
+    var name by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Thực hành 02",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(bottom = 24.dp)
+            "THỰC HÀNH 01",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        OutlinedTextField(
-            value = email,
-            onValueChange = {
-                email = it
-                message = "" // Reset khi người dùng gõ lại
-            },
-            label = { Text("Email") },
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-        )
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFE0E0E0)
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 0.dp
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                // Họ và tên field
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Họ và tên",
+                        modifier = Modifier.width(80.dp),
+                        color = Color.Black
+                    )
+                    TextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.White,
+                            focusedContainerColor = Color.White,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent
+                        ),
+                        singleLine = true
+                    )
+                }
+
+                // Tuổi field
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Tuổi",
+                        modifier = Modifier.width(80.dp),
+                        color = Color.Black
+                    )
+                    TextField(
+                        value = age,
+                        onValueChange = { age = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.White,
+                            focusedContainerColor = Color.White,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent
+                        ),
+                        singleLine = true
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                message = if (age.isBlank()) {
+                    "Vui lòng nhập tuổi"
+                } else {
+                    val ageInt = age.toIntOrNull()
+                    when {
+                        ageInt == null -> "Tuổi không hợp lệ"
+                        ageInt > 65 -> "$name là người già"
+                        ageInt in 6..65 -> "$name là người lớn"
+                        ageInt in 2..5 -> "$name là trẻ em"
+                        ageInt in 0..1 -> "$name là em bé"
+                        else -> "Tuổi không hợp lệ"
+                    }
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF0D47A1)
+            )
+        ) {
+            Text("Kiểm tra", fontSize = 16.sp, color = Color.White)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         if (message.isNotEmpty()) {
             Text(
                 text = message,
-                color = if (message.contains("hợp lệ")) Color(0xFF4CAF50) else Color.Red,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Start,
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .fillMaxWidth()
+                color = if (message.contains("không hợp lệ") || message.contains("Vui lòng")) Color.Red else Color.Blue,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
             )
-        }
-
-        Button(
-            onClick = {
-                message = when {
-                    email.isBlank() -> "Email không hợp lệ"
-                    !email.contains("@") || !email.contains(".") -> "Email không đúng định dạng"
-                    else -> "Bạn đã nhập email hợp lệ"
-                }
-            },
-            modifier = Modifier
-                .padding(top = 24.dp)
-                .fillMaxWidth()
-                .height(48.dp)
-                .clip(RoundedCornerShape(50)),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)) // Màu xanh iOS
-        ) {
-            Text("Kiểm tra", fontSize = 16.sp)
         }
     }
 }
